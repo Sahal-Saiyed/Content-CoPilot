@@ -132,7 +132,7 @@ if uploaded_file is not None:
             color_continuous_scale="RdYlGn",
             title=f"XGBoost + SHAP Attribution (Weights: {score_result['weights_source']})",
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         st.markdown("### 🚨 Top Algorithmic Bottlenecks to Fix")
         if score_result["top_bottlenecks"]:
@@ -150,20 +150,8 @@ if uploaded_file is not None:
             st.image(
                 f"data:image/jpeg;base64,{analysis['storyboard_b64']}",
                 caption="12 Scene-Aware Narrative Frames (#1 to #12) with Exact Timestamps",
-                use_container_width=True,
+                width="stretch",
             )
-
-        keys = ["hook_1s", "hook_3s", "midpoint_50pct", "cta_90pct"]
-        labels = ["Hook (0:01)", "Hook (0:03)", "Midpoint (50%)", "CTA / End (90%)"]
-        cols = st.columns(4)
-        for i, k in enumerate(keys):
-            if k in analysis["keyframes"]:
-                with cols[i]:
-                    st.image(
-                        f"data:image/jpeg;base64,{analysis['keyframes'][k]['b64_safezone']}",
-                        caption=labels[i],
-                        use_container_width=True,
-                    )
 
         st.markdown(f"### 🤖 VLM Agent Recommendations (`{vlm_result['model_used']}`)")
         st.info(vlm_result["visual_audit"])
