@@ -49,52 +49,44 @@ Creator Co-Pilot AI leverages AMD Instinct cloud inference and the AMD Token Fac
 ## 🔒 Security & Docker Secret Architecture
 Security and zero-trust credential hygiene are central to Creator Co-Pilot AI:
 
-- **No Hardcoded Credentials:** API keys are never stored in source code.
-- **No Image Layer Leaks:** Credentials are never baked into Docker images during build time. `.dockerignore` excludes `api_key.txt`, `.env`, and local virtual environments.
-- **Version Control Protection:** `.gitignore` ensures `api_key.txt` and sensitive caches never get committed to GitHub.
-- **Runtime Secret Mounting:** At container runtime, Docker Compose mounts `api_key.txt` as a standard Linux secret file at `/run/secrets/amd_api_key`.
-- **Resilient Dual-Mode Resolution (`get_secret`):** The application inspects `/run/secrets/amd_api_key` first, gracefully falls back to the `AMD_API_KEY` environment variable, or allows configuration directly in the Streamlit UI sidebar without crashing on import.
+- **Zero UI Exposure:** API keys are never rendered, input, or visible within the Streamlit web dashboard.
+- **Dedicated Streamlit Secrets File:** For local Streamlit execution, credentials reside in `.streamlit/secrets.toml`, which is ignored by both Git and Docker. A safe `.streamlit/secrets.toml.example` template is provided.
+- **Docker Secrets Runtime Mounting:** In production container environments, Docker Compose mounts `api_key.txt` directly to `/run/secrets/amd_api_key`.
+- **Zero Image Leaks:** `.dockerignore` excludes `api_key.txt`, `.streamlit/secrets.toml`, `.env`, and virtual environments from ever entering image layers.
+- **Version Control Protection:** `.gitignore` shields all secret files and sensitive caches from git tracking.
+- **Multi-Tier Resolution (`get_secret`):** Transparently checks `/run/secrets/{secret_name}`, `st.secrets` (`.streamlit/secrets.toml`), local secret files, and environment variables without crashing.
 
 ---
 
 ## 🚀 Quickstart & Run Commands
 
-### Prerequisites
-- [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/) installed.
-- Valid AMD Token Factory API key.
-
-### Step 1: Provision Secret File
-Create `api_key.txt` in the root project directory containing your AMD API key:
-```bash
-echo your_api_key_here > api_key.txt
-```
-
-### Step 2: Build & Launch with Docker Compose
-```bash
-docker compose up --build
-```
-
-The Streamlit dashboard will be live at:
-👉 **`http://localhost:8501`**
+### Option A: Run with Docker Compose (Recommended)
+1. Create `api_key.txt` in the project root:
+   ```bash
+   echo your_api_key_here > api_key.txt
+   ```
+2. Build and run:
+   ```bash
+   docker compose up --build
+   ```
+3. Open your browser at **`http://localhost:8501`**.
 
 ---
 
-### Local Development (Alternative)
-If running locally without Docker:
-```bash
-# 1. Create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .\.venv\Scripts\Activate.ps1
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Export API key
-export AMD_API_KEY="your_api_key_here"  # On Windows: $env:AMD_API_KEY="your_api_key_here"
-
-# 4. Launch app
-streamlit run app.py
-```
+### Option B: Local Streamlit Development
+1. Create `.streamlit/secrets.toml` from the example template:
+   ```bash
+   cp .streamlit/secrets.toml.example .streamlit/secrets.toml
+   ```
+2. Fill in your AMD API key in `.streamlit/secrets.toml`:
+   ```toml
+   amd_api_key = "your_actual_amd_token_factory_key"
+   AMD_BASE_URL = "https://developer.amd.com.cn/radeon/api/v1"
+   ```
+3. Launch Streamlit:
+   ```bash
+   streamlit run app.py
+   ```
 
 ---
 

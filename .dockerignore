@@ -6,3 +6,6 @@ __pycache__/
 temp_*.mp4
 sample_*.mp4
 .git/
+.idea/
+.antigravity/
+.streamlit/secrets.toml

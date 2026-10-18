@@ -6,13 +6,58 @@ load_dotenv()
 
 
 def get_secret(secret_name: str, default: str = "") -> str:
+    # 1. Docker secrets mount path (/run/secrets/{secret_name})
     secret_path = f"/run/secrets/{secret_name}"
     if os.path.exists(secret_path):
-        with open(secret_path, "r", encoding="utf-8") as f:
-            val = f.read().strip()
-            if val:
-                return val
-    return os.getenv(secret_name, default)
+        try:
+            with open(secret_path, "r", encoding="utf-8") as f:
+                val = f.read().strip()
+                if val:
+                    return val
+        except Exception:
+            pass
+
+    # 2. Streamlit runtime secrets
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets"):
+            if secret_name in st.secrets:
+                return str(st.secrets[secret_name]).strip()
+            if secret_name.upper() in st.secrets:
+                return str(st.secrets[secret_name.upper()]).strip()
+    except Exception:
+        pass
+
+    # 3. Direct .streamlit/secrets.toml check (outside Streamlit runtime)
+    toml_path = os.path.join(".streamlit", "secrets.toml")
+    if os.path.exists(toml_path):
+        try:
+            with open(toml_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if "=" in line and not line.startswith("#"):
+                        k, v = line.split("=", 1)
+                        if k.strip().lower() == secret_name.lower():
+                            val = v.strip().strip('"').strip("'")
+                            if val:
+                                return val
+        except Exception:
+            pass
+
+    # 4. Local secret file
+    for alt_file in [f"./{secret_name}.txt", "./api_key.txt"]:
+        if os.path.exists(alt_file):
+            try:
+                with open(alt_file, "r", encoding="utf-8") as f:
+                    val = f.read().strip()
+                    if val:
+                        return val
+            except Exception:
+                pass
+
+    # 5. Environment variables
+    val = os.getenv(secret_name.upper(), os.getenv(secret_name, default))
+    return val if val else default
 
 
 active_key = get_secret("amd_api_key", os.getenv("AMD_API_KEY", ""))

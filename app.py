@@ -50,16 +50,6 @@ with st.sidebar:
         ],
     )
 
-    st.sidebar.header("Configuration")
-    active_key = get_secret("amd_api_key", os.getenv("AMD_API_KEY", ""))
-    api_key_input = st.sidebar.text_input(
-        "AMD Token Factory API Key",
-        value=active_key,
-        type="password",
-        help="Enter key if not mounted via Docker secrets",
-    )
-    if api_key_input:
-        os.environ["AMD_API_KEY"] = api_key_input
 
     st.info(
         "⚡ **AMD Instinct Telemetry**\n"

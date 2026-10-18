@@ -9,3 +9,4 @@ virality_xgb_weights.json
 real_viral_dataset.csv
 .idea/
 .antigravity/
+.streamlit/secrets.toml
