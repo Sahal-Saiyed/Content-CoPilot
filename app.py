@@ -8,7 +8,17 @@ from extractor import analyze_video_file
 from benchmark_model import CategoryBenchmarkScorer
 from agents import run_visual_and_scene_critic, run_storyline_advisor, get_secret
 
-st.set_page_config(page_title="Creator Co-Pilot | AMD Hackathon ACT III", layout="wide")
+LOGO_FILE = "Content_Co-Pilot_Icon.png"
+LOGO_PATH = LOGO_FILE if os.path.exists(LOGO_FILE) else None
+
+st.set_page_config(
+    page_title="Creator Co-Pilot | AMD Hackathon ACT III",
+    page_icon=LOGO_PATH if LOGO_PATH else "🎬",
+    layout="wide",
+)
+
+if LOGO_PATH:
+    st.logo(LOGO_PATH)
 
 # Detect active AMD Token Factory API key on startup
 active_key = get_secret("amd_api_key", os.getenv("AMD_API_KEY", ""))
@@ -35,10 +45,20 @@ def cached_extract_video(file_bytes: bytes) -> dict:
 
 scorer = get_scorer()
 
-st.title("🎬 Creator Co-Pilot AI")
+if LOGO_PATH:
+    col_logo, col_title = st.columns([1, 10], vertical_alignment="center")
+    with col_logo:
+        st.image(LOGO_PATH, width=70)
+    with col_title:
+        st.title("Creator Co-Pilot AI")
+else:
+    st.title("Creator Co-Pilot AI")
+
 st.caption("Pre-Publish Multimodal Video Advisor | Powered by AMD Instinct GPUs & ROCm Models")
 
 with st.sidebar:
+    if LOGO_PATH:
+        st.image(LOGO_PATH, width=120)
     st.header("⚙️ Project Settings")
     category = st.selectbox(
         "Content Niche / Category",
