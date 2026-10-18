@@ -7,7 +7,7 @@ scikit-learn
 pillow
 python-dotenv
 openai
-opencv-python
+opencv-python-headless
 numpy
 librosa
 scenedetect
