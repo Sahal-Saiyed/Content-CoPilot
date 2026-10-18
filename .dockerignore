@@ -1,0 +1,8 @@
+api_key.txt
+.env
+.venv/
+__pycache__/
+*.pyc
+temp_*.mp4
+sample_*.mp4
+.git/

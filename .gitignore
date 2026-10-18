@@ -1,0 +1,11 @@
+api_key.txt
+.env
+.venv/
+__pycache__/
+*.pyc
+temp_*.mp4
+sample_*.mp4
+virality_xgb_weights.json
+real_viral_dataset.csv
+.idea/
+.antigravity/

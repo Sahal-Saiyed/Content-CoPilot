@@ -1,0 +1,14 @@
+streamlit
+pandas
+plotly
+xgboost
+shap
+scikit-learn
+pillow
+python-dotenv
+openai
+opencv-python
+numpy
+librosa
+scenedetect
+faster-whisper
